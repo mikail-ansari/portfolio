@@ -1,72 +1,107 @@
-import { ExternalLink } from "lucide-react";
+import { useRef } from "react";
+import { m, useMotionTemplate, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 import { site } from "../config/site.js";
-import Section from "./Section.jsx";
-import Reveal from "./Reveal.jsx";
-import { Icon, GithubIcon } from "./icons.jsx";
+import { GithubIcon } from "./icons.jsx";
+import PlaceholderArt from "./PlaceholderArt.jsx";
+import SectionHeading from "./SectionHeading.jsx";
 
-function ProjectCard({ p, index }) {
-  const hasLinks = p.github || p.demo;
+/** Browser-style preview that tilts toward the pointer and catches a moving glare. */
+function Preview({ p, i }) {
+  const ref = useRef(null);
+  const reduce = useReducedMotion();
+  const rx = useSpring(useMotionValue(0), { stiffness: 160, damping: 18 });
+  const ry = useSpring(useMotionValue(0), { stiffness: 160, damping: 18 });
+  const gx = useMotionValue(50);
+  const gy = useMotionValue(50);
+  const glare = useMotionTemplate`radial-gradient(500px circle at ${gx}% ${gy}%, rgba(255,255,255,.22), transparent 45%)`;
+
+  const move = (e) => {
+    if (reduce || e.pointerType === "touch") return;
+    const r = ref.current.getBoundingClientRect();
+    const px = (e.clientX - r.left) / r.width;
+    const py = (e.clientY - r.top) / r.height;
+    ry.set((px - 0.5) * 12);
+    rx.set((0.5 - py) * 10);
+    gx.set(px * 100);
+    gy.set(py * 100);
+  };
+  const reset = () => {
+    rx.set(0);
+    ry.set(0);
+  };
+
   return (
-    <Reveal delay={(index % 3) * 0.06} className="h-full">
-      <article className="card group flex h-full flex-col overflow-hidden rounded-2xl">
-        {/* Screenshot, or a clean placeholder until you add one */}
-        {p.image ? (
-          <img src={p.image} alt={`${p.title} screenshot`} loading="lazy" className="aspect-[16/9] w-full border-b border-line object-cover" />
-        ) : (
-          <div className="relative grid aspect-[16/9] place-items-center border-b border-line bg-[radial-gradient(70%_80%_at_50%_0%,rgba(34,211,238,0.10),transparent)]">
-            <div className="grid-bg absolute inset-0 opacity-60" />
-            <span className="relative grid h-14 w-14 place-items-center rounded-2xl border border-line bg-white/[0.04] text-cyan">
-              <Icon name={p.icon} size={26} />
-            </span>
-          </div>
-        )}
-
-        <div className="flex flex-1 flex-col p-6">
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="text-lg font-semibold tracking-tight text-white">{p.title}</h3>
-            {p.placeholder && (
-              <span className="shrink-0 rounded-full border border-line px-2.5 py-1 font-mono text-[11px] text-muted">Placeholder</span>
-            )}
-          </div>
-          <p className="mt-3 flex-1 text-[15px] leading-relaxed text-muted">{p.description}</p>
-          <ul className="mt-5 flex flex-wrap gap-1.5" aria-label="Technologies">
-            {p.tags.map((t) => (
-              <li key={t} className="rounded-md bg-cyan/[0.08] px-2.5 py-1 font-mono text-[11px] text-cyan">{t}</li>
-            ))}
-          </ul>
-          {hasLinks && (
-            <div className="mt-5 flex gap-4 border-t border-line pt-4 text-sm">
-              {p.github && (
-                <a href={p.github} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-muted hover:text-white">
-                  <GithubIcon className="h-4 w-4" /> Code<span className="sr-only"> for {p.title} (opens in a new tab)</span>
-                </a>
-              )}
-              {p.demo && (
-                <a href={p.demo} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-muted hover:text-white">
-                  <ExternalLink size={15} aria-hidden="true" /> Live demo<span className="sr-only"> of {p.title} (opens in a new tab)</span>
-                </a>
-              )}
-            </div>
-          )}
+    <div style={{ perspective: 1100 }} className="w-full">
+      <m.div ref={ref} onPointerMove={move} onPointerLeave={reset} data-cursor={p.demo ? "Open" : "Preview"} style={{ rotateX: rx, rotateY: ry, transformStyle: "preserve-3d" }} className="relative overflow-hidden rounded-2xl border border-line bg-bg2 shadow-[0_30px_80px_-30px_rgba(0,0,0,0.6)]">
+        <div className="flex items-center gap-2 border-b border-line bg-bg/70 px-4 py-3">
+          <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f57]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#febc2e]" />
+          <span className="h-2.5 w-2.5 rounded-full bg-[#28c840]" />
+          <span className="ml-3 truncate rounded-md bg-fg/5 px-3 py-1 font-mono text-[11px] text-muted">{p.demo ? p.demo.replace(/^https?:\/\//, "") : "preview coming soon"}</span>
         </div>
-      </article>
-    </Reveal>
+        <div className="relative aspect-[16/10]">
+          {p.image ? <img src={p.image} alt={`${p.title} screenshot`} loading="lazy" className="h-full w-full object-cover" /> : <PlaceholderArt category={p.category === "Web Design" ? "App UI" : p.category} seed={i + 2} label={p.placeholder} />}
+          <m.div aria-hidden="true" className="pointer-events-none absolute inset-0 mix-blend-overlay" style={{ background: glare }} />
+        </div>
+      </m.div>
+    </div>
   );
 }
 
 export default function Projects() {
   return (
-    <Section
-      id="projects"
-      eyebrow="04 / Projects"
-      title="Selected work"
-      intro="Project areas I work in. Real case studies, screenshots and links are being added as they are ready."
-    >
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {site.projects.map((p, i) => (
-          <ProjectCard key={p.title} p={p} index={i} />
-        ))}
+    <section id="projects" aria-labelledby="projects-title" className="relative px-5 py-24 sm:px-8 sm:py-36">
+      <div className="mx-auto max-w-7xl">
+        <SectionHeading id="projects-title" index="05" eyebrow="Projects" title="Selected" outlineWord="work" />
+        <p className="-mt-6 mb-16 max-w-2xl text-muted sm:-mt-8">The areas I work in. Cards marked "Placeholder" are project categories waiting for real case studies, screenshots and links, not finished client projects.</p>
+
+        <ol className="space-y-24 sm:space-y-32">
+          {site.projects.map((p, i) => {
+            const flip = i % 2 === 1;
+            return (
+              <li key={p.title}>
+                <m.article initial={{ opacity: 0, y: 60 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-12%" }} transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }} className="group grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
+                  <div className={`lg:col-span-7 ${flip ? "lg:order-2" : ""}`}>
+                    <Preview p={p} i={i} />
+                  </div>
+                  <div className={`lg:col-span-5 ${flip ? "lg:order-1 lg:text-right" : ""}`}>
+                    <p className={`display outline text-[clamp(4rem,10vw,8rem)] leading-none transition-all duration-500 group-hover:text-lime group-hover:[-webkit-text-stroke-color:var(--lime)] ${flip ? "lg:ml-auto" : ""}`}>{String(i + 1).padStart(2, "0")}</p>
+                    <div className={`mt-4 flex flex-wrap items-center gap-3 ${flip ? "lg:justify-end" : ""}`}>
+                      <h3 className="display text-[clamp(1.6rem,3.4vw,2.6rem)] leading-[1] text-fg">{p.title}</h3>
+                      {p.placeholder && <span className="rounded-full border border-line px-3 py-1 font-mono text-[11px] uppercase tracking-wider text-muted">Placeholder</span>}
+                    </div>
+                    <p className="mt-4 text-base leading-relaxed text-muted">{p.description}</p>
+                    <ul className={`mt-5 flex flex-wrap gap-2 ${flip ? "lg:justify-end" : ""}`} aria-label="Technologies">
+                      {p.tags.map((t) => (
+                        <li key={t} className="rounded-full border border-line px-3.5 py-1.5 font-mono text-xs text-fg transition-all group-hover:border-neon/60 group-hover:bg-violet/10">
+                          {t}
+                        </li>
+                      ))}
+                    </ul>
+                    {(p.github || p.demo) && (
+                      <div className={`mt-6 flex flex-wrap gap-3 ${flip ? "lg:justify-end" : ""}`}>
+                        {p.demo && (
+                          <a href={p.demo} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full bg-lime px-5 py-3 text-sm font-bold text-onlime">
+                            Live demo <ArrowUpRight size={16} aria-hidden="true" />
+                            <span className="sr-only">of {p.title} (opens in a new tab)</span>
+                          </a>
+                        )}
+                        {p.github && (
+                          <a href={p.github} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-line px-5 py-3 text-sm font-bold text-fg hover:border-lime">
+                            <GithubIcon className="h-4 w-4" /> Source code
+                            <span className="sr-only"> for {p.title} (opens in a new tab)</span>
+                          </a>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </m.article>
+              </li>
+            );
+          })}
+        </ol>
       </div>
-    </Section>
+    </section>
   );
 }

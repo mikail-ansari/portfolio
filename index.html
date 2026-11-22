@@ -1,40 +1,51 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Md Mikail Ansari | Production Coordinator, Systems Administrator &amp; Frontend Developer</title>
+    <title>Md Mikail Ansari | Creative Technologist – Frontend, Systems &amp; Print Production</title>
     <meta
       name="description"
-      content="Md Mikail Ansari is a Production Coordinator, Systems Administrator and Frontend Developer in Scarborough, Ontario, bridging technology and operations with efficient digital workflows."
+      content="Md Mikail Ansari is a creative technologist in Scarborough, Ontario, connecting systems, code and creativity across frontend development, systems administration and print production."
     />
     <meta name="author" content="Md Mikail Ansari" />
-    <meta name="theme-color" content="#080B12" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#07060b" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="canonical" href="%SITE_URL%/" data-needs-site-url />
 
+    <!-- Set the saved theme before first paint to avoid a flash -->
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem("ma-theme");
+          if (t !== "light" && t !== "dark") {
+            t = window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+          }
+          document.documentElement.setAttribute("data-theme", t);
+          var m = document.querySelector('meta[name="theme-color"]');
+          if (m) m.setAttribute("content", t === "light" ? "#faf6ee" : "#07060b");
+        } catch (e) {}
+      })();
+    </script>
+
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Md Mikail Ansari | Production Coordinator, Systems Administrator & Frontend Developer" />
+    <meta property="og:title" content="Md Mikail Ansari | Creative Technologist" />
     <meta
       property="og:description"
-      content="Bridging technology and operations: digital workflows, systems administration and frontend development."
+      content="Connecting systems, code and creativity: frontend development, systems administration and print production."
     />
     <meta property="og:url" content="%SITE_URL%/" data-needs-site-url />
     <meta property="og:image" content="%SITE_URL%/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Md Mikail Ansari - Production Coordinator, Systems Administrator, Frontend Developer" />
+    <meta property="og:image:alt" content="Md Mikail Ansari - Creative Technologist. Building digital experiences." />
     <meta property="og:locale" content="en_CA" />
 
     <!-- Twitter / X card -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Md Mikail Ansari | Portfolio" />
-    <meta
-      name="twitter:description"
-      content="Production Coordinator | Systems Administrator | Frontend Developer"
-    />
+    <meta name="twitter:title" content="Md Mikail Ansari | Creative Technologist" />
+    <meta name="twitter:description" content="Frontend Developer | Systems Administrator | Production Coordinator" />
     <meta name="twitter:image" content="%SITE_URL%/og-image.png" />
 
     <!-- Structured data -->
@@ -43,7 +54,7 @@
         "@context": "https://schema.org",
         "@type": "Person",
         "name": "Md Mikail Ansari",
-        "jobTitle": "Production Coordinator, Systems Administrator & Frontend Developer",
+        "jobTitle": "Creative Technologist",
         "worksFor": { "@type": "Organization", "name": "HipSkip Communications Inc." },
         "alumniOf": { "@type": "CollegeOrUniversity", "name": "Georgian College" },
         "address": {
@@ -59,10 +70,10 @@
   <body>
     <div id="root"></div>
     <noscript>
-      <p style="font-family: sans-serif; padding: 2rem; color: #e6edf7; background: #080b12">
-        Md Mikail Ansari - Production Coordinator | Systems Administrator | Frontend Developer. Please enable
-        JavaScript to view this portfolio, or visit
-        <a href="https://www.linkedin.com/in/-mikail-ansari/" style="color: #22d3ee">LinkedIn</a>.
+      <p style="font-family: sans-serif; padding: 2rem; color: #f4f1fb; background: #07060b">
+        Md Mikail Ansari - Creative Technologist | Frontend Developer | Systems Administrator | Production Coordinator.
+        Please enable JavaScript to view this portfolio, or visit
+        <a href="https://www.linkedin.com/in/-mikail-ansari/" style="color: #c8ff3e">LinkedIn</a>.
       </p>
     </noscript>
     <script type="module" src="/src/main.jsx"></script>
